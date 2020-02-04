@@ -10,7 +10,8 @@ def output(line):
 def grep(lines, params):
     for line in lines:
         line = line.rstrip()
-        if params.pattern in line:
+        if (not params.invert and params.pattern in line) or (
+                params.invert and not params.pattern in line):
             output(line)
 
 
