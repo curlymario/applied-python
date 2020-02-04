@@ -17,9 +17,17 @@ def grep(lines, params):
 def parse_args(args):
     parser = argparse.ArgumentParser(description='This is a simple grep on python')
     parser.add_argument(
-        '-v', action="store_true", dest="invert", default=False, help='Selected lines are those not matching pattern.')
+        '-v',
+        action="store_true",
+        dest="invert",
+        default=False,
+        help='Selected lines are those not matching pattern.')
     parser.add_argument(
-        '-i', action="store_true", dest="ignore_case", default=False, help='Perform case insensitive matching.')
+        '-i',
+        action="store_true",
+        dest="ignore_case",
+        default=False,
+        help='Perform case insensitive matching.')
     parser.add_argument(
         '-c',
         action="store_true",
@@ -53,7 +61,10 @@ def parse_args(args):
         type=int,
         default=0,
         help='Print num lines of leading context before each match.')
-    parser.add_argument('pattern', action="store", help='Search pattern. Can contain magic symbols: ?*')
+    parser.add_argument(
+        'pattern',
+        action="store",
+        help='Search pattern. Can contain magic symbols: ?*')
     return parser.parse_args(args)
 
 
