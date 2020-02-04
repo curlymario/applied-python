@@ -28,14 +28,22 @@ def count_lines(lines, params):
             line_count += 1
     return line_count
 
+def enumerate_line(i, line):
+    return str(i + 1) + ':' + line
+
+def enumerate_context(i, line):
+    return str(i + 1) + '-' + line
+
 def grep(lines, params):
     if params.count:
         line_count = count_lines(lines, params)
         output(str(line_count))
     else:
-        for line in lines:
+        for i, line in enumerate(lines):
             line = line.rstrip()
             if pattern_match(line, params):
+                if params.line_number:
+                    line = enumerate_line(i, line)
                 output(line)
 
 
