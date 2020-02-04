@@ -7,12 +7,29 @@ def output(line):
     print(line)
 
 
-def grep(lines, params):
+def pattern_match(line, params):
+    if (not params.invert and params.pattern in line) or (
+            params.invert and not params.pattern in line):
+        return True
+
+def count_lines(lines, params):
+    line_count = 0
     for line in lines:
         line = line.rstrip()
-        if (not params.invert and params.pattern in line) or (
-                params.invert and not params.pattern in line):
-            output(line)
+        if pattern_match(line, params):
+            line_count += 1
+    return line_count
+
+def grep(lines, params):
+    if params.count:
+        line_count = count_lines(lines, params)
+        output(str(line_count))
+    else:
+        for line in lines:
+            line = line.rstrip()
+            if pattern_match(line, params):
+                output(line)
+
 
 
 def parse_args(args):
