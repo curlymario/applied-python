@@ -8,9 +8,17 @@ def output(line):
 
 
 def pattern_match(line, params):
-    if (not params.invert and params.pattern in line) or (
-            params.invert and not params.pattern in line):
+    if params.ignore_case:
+        if not params.invert and params.pattern.lower() in line.lower():
+            return True
+        elif params.invert and not params.pattern.lower() in line.lower():
+            return True
+    elif not params.invert and params.pattern in line:
         return True
+    elif params.invert and not params.pattern in line:
+        return True
+    else:
+        return False
 
 def count_lines(lines, params):
     line_count = 0
