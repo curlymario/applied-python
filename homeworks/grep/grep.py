@@ -28,10 +28,10 @@ def count_lines(lines, params):
     return line_count
 
 def enumerate_line(i, line):
-    return str(i + 1) + ':' + line
+    return f'{i + 1}:{line}'
 
 def enumerate_context(i, line):
-    return str(i + 1) + '-' + line
+    return f'{i + 1}-{line}'
 
 def grep(lines, params):
     if params.count:
