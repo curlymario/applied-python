@@ -8,14 +8,13 @@ def output(line):
 
 
 def pattern_match(line, params):
+    pattern = params.pattern
     if params.ignore_case:
-        if not params.invert and params.pattern.lower() in line.lower():
-            return True
-        elif params.invert and not params.pattern.lower() in line.lower():
-            return True
-    elif not params.invert and params.pattern in line:
+        pattern = pattern.lower()
+        line = line.lower()
+    if not params.invert and pattern in line:
         return True
-    elif params.invert and not params.pattern in line:
+    elif params.invert and not pattern in line:
         return True
     else:
         return False
