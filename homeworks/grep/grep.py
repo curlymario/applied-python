@@ -8,27 +8,31 @@ def output(line):
     print(line)
 
 
-def pattern_match(line, params):
-    pattern = params.pattern
-    if '*' in pattern:
-        pattern = pattern.replace('*', '.*')
-    if '?' in pattern:
-        pattern = pattern.replace('?', '.')
-    if params.ignore_case:
-        pattern = pattern.lower()
-        line = line.lower()
-    if not params.invert and re.search(pattern, line) is not None:
+def pattern_match(line, params, regexp):
+    if not params.invert and regexp.search(line) is not None:
         return True
-    elif params.invert and re.search(pattern, line) is None:
+    elif params.invert and regexp.search(line) is None:
         return True
     else:
         return False
 
-def count_lines(lines, params):
+def pattern_compile(params):
+    pattern_string = params.pattern
+
+    if '*' in pattern_string:
+        pattern_string = pattern_string.replace('*', '.*')
+    if '?' in pattern_string:
+        pattern_string = pattern_string.replace('?', '.')
+    if params.ignore_case:
+        return re.compile(pattern_string, re.I)
+    else:
+        return re.compile(pattern_string)
+
+def count_lines(lines, params, pattern):
     line_count = 0
     for line in lines:
         line = line.rstrip()
-        if pattern_match(line, params):
+        if pattern_match(line, params, pattern):
             line_count += 1
     return line_count
 
@@ -39,13 +43,14 @@ def enumerate_context(i, line):
     return f'{i + 1}-{line}'
 
 def grep(lines, params):
+    pattern = pattern_compile(params)
     if params.count:
-        line_count = count_lines(lines, params)
+        line_count = count_lines(lines, params, pattern)
         output(str(line_count))
     else:
         for i, line in enumerate(lines):
             line = line.rstrip()
-            if pattern_match(line, params):
+            if pattern_match(line, params, pattern):
                 if params.line_number:
                     line = enumerate_line(i, line)
                 output(line)
