@@ -11,9 +11,9 @@ def output(line):
 def pattern_match(line, params):
     pattern = params.pattern
     if '*' in pattern:
-        pattern = re.sub('\*', '\.*', pattern)
+        pattern = pattern.replace('*', '.*')
     if '?' in pattern:
-        pattern = re.sub('\?', '\.', pattern)
+        pattern = pattern.replace('?', '.')
     if params.ignore_case:
         pattern = pattern.lower()
         line = line.lower()
