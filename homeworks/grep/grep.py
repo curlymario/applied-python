@@ -1,6 +1,7 @@
 
 import argparse
 import sys
+import re
 
 
 def output(line):
@@ -9,12 +10,16 @@ def output(line):
 
 def pattern_match(line, params):
     pattern = params.pattern
+    if '*' in pattern:
+        pattern = re.sub('\*', '\.*', pattern)
+    if '?' in pattern:
+        pattern = re.sub('\?', '\.', pattern)
     if params.ignore_case:
         pattern = pattern.lower()
         line = line.lower()
-    if not params.invert and pattern in line:
+    if not params.invert and re.search(pattern, line) is not None:
         return True
-    elif params.invert and not pattern in line:
+    elif params.invert and re.search(pattern, line) is None:
         return True
     else:
         return False
