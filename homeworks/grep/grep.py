@@ -8,10 +8,8 @@ def output(line):
     print(line)
 
 
-def pattern_match(line, params, regexp):
-    if not params.invert and regexp.search(line) is not None:
-        return True
-    elif params.invert and regexp.search(line) is None:
+def pattern_match(pattern, line):
+    if pattern.search(line) is not None:
         return True
     else:
         return False
@@ -23,16 +21,18 @@ def pattern_compile(params):
         pattern_string = pattern_string.replace('*', '.*')
     if '?' in pattern_string:
         pattern_string = pattern_string.replace('?', '.')
+    if params.invert:
+        pattern_string = f'^((?!{pattern_string}).)*$'
     if params.ignore_case:
         return re.compile(pattern_string, re.I)
     else:
         return re.compile(pattern_string)
 
-def count_lines(lines, params, pattern):
+def count_lines(lines, pattern):
     line_count = 0
     for line in lines:
         line = line.rstrip()
-        if pattern_match(line, params, pattern):
+        if pattern_match(pattern, line):
             line_count += 1
     return line_count
 
@@ -45,12 +45,12 @@ def enumerate_context(i, line):
 def grep(lines, params):
     pattern = pattern_compile(params)
     if params.count:
-        line_count = count_lines(lines, params, pattern)
+        line_count = count_lines(lines, pattern)
         output(str(line_count))
     else:
         for i, line in enumerate(lines):
             line = line.rstrip()
-            if pattern_match(line, params, pattern):
+            if pattern_match(pattern, line):
                 if params.line_number:
                     line = enumerate_line(i, line)
                 output(line)
