@@ -42,14 +42,14 @@ def enumerate_line(i, line):
 def enumerate_context(i, line):
     return f'{i + 1}-{line}'
 
-def output_context(num, lines, used, pattern, params):
-    if len(lines) >= num + 1:
-        context = lines[num].rstrip()
+def output_context(n, lines, used, pattern, params):
+    if len(lines) >= n + 1:
+        context = lines[n].rstrip()
         if context not in used:
-            used.append(context)
+            used.add(context)
             if not pattern_match(pattern, context):
                 if params.line_number:
-                    context = enumerate_context(num, context)
+                    context = enumerate_context(n, context)
                 output(context)
 
 def grep(lines, params):
@@ -59,15 +59,14 @@ def grep(lines, params):
         output(str(line_count))
     else:
         N = params.context or params.before_context or params.after_context or 0
-        used = []
+        used = set()
         for i, line in enumerate(lines):
             line = line.rstrip()
             if pattern_match(pattern, line):
 
                 if params.context or params.before_context:
                     for j in range(-N, 0):
-                        num = i + j
-                        output_context(num, lines, used, pattern, params)
+                        output_context(i + j, lines, used, pattern, params)
 
                 if params.line_number:
                     line = enumerate_line(i, line)
@@ -75,8 +74,7 @@ def grep(lines, params):
 
                 if params.context or params.after_context:
                     for j in range(1, N+1):
-                        num = i + j
-                        output_context(num, lines, used, pattern, params)
+                        output_context(i + j, lines, used, pattern, params)
 
 
 def parse_args(args):
