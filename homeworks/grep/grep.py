@@ -1,4 +1,3 @@
-
 import argparse
 import sys
 import re
@@ -14,6 +13,7 @@ def pattern_match(pattern, line):
     else:
         return False
 
+
 def pattern_compile(params):
     pattern_string = params.pattern
 
@@ -28,6 +28,7 @@ def pattern_compile(params):
     else:
         return re.compile(pattern_string)
 
+
 def count_lines(lines, pattern):
     line_count = 0
     for line in lines:
@@ -36,11 +37,14 @@ def count_lines(lines, pattern):
             line_count += 1
     return line_count
 
+
 def enumerate_line(i, line):
     return f'{i + 1}:{line}'
 
+
 def enumerate_context(i, line):
     return f'{i + 1}-{line}'
+
 
 def output_context(n, lines, used, pattern, params):
     if len(lines) >= n + 1:
@@ -51,6 +55,7 @@ def output_context(n, lines, used, pattern, params):
                 if params.line_number:
                     context = enumerate_context(n, context)
                 output(context)
+
 
 def grep(lines, params):
     pattern = pattern_compile(params)
@@ -73,7 +78,7 @@ def grep(lines, params):
                 output(line)
 
                 if params.context or params.after_context:
-                    for j in range(1, N+1):
+                    for j in range(1, N + 1):
                         output_context(i + j, lines, used, pattern, params)
 
 
