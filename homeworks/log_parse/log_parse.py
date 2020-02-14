@@ -25,6 +25,7 @@ class Log_pattern(NamedTuple):
 
 class Request(NamedTuple):
     schema: str
+    url: str
     host: str
     path: str
 
@@ -52,13 +53,13 @@ def read_log(log_file, pattern):
             _time = _time.replace(']', '')
             _schema = pattern.schema.search(_request).group(0)
             _host = pattern.host.search(_request).group(0)
-            _fullpath = pattern.fullpath.search(_request).group(0)
-            _path = pattern.path.search(_fullpath).group(0)
+            _url = pattern.fullpath.search(_request).group(0)
+            _path = pattern.path.search(_url).group(0)
 
             entry = Log_entry(
                 request_date=convert_datetime(' '.join((_date, _time))),
                 request_type=_type,
-                request=Request(_schema, _host, _path),
+                request=Request(_schema, _url, _host, _path),
                 protocol=_protocol,
                 response_code=int(_r_code),
                 response_time=int(_r_time)
@@ -81,7 +82,43 @@ def parse(
     log_file = open('log.log', 'r')
     log = read_log(log_file, parsing_patterns)
 
-    return []
+    top_logs = {}
+    for entry in log:
+        if ignore_files and parsing_patterns.file.search(entry.request.path):
+            continue
+        if ignore_urls and entry.request.host in ignore_urls:
+            continue
+        if start_at and entry.request_date < convert_datetime(start_at):
+            continue
+        if stop_at and entry.request_date > convert_datetime(stop_at):
+            continue
+        if request_type and entry.request_type != request_type:
+            continue
+
+        url = entry.request.url
+        if ignore_www:
+            url = url.replace('www.', '')
+
+        if slow_queries:
+            if url in top_logs:
+                top_logs[url]['count'] += 1
+                top_logs[url]['time'] += entry.response_time
+            else:
+                top_logs[url] = {'count': 1, 'time': entry.response_time}
+        else:
+            if url in top_logs:
+                top_logs[url] += 1
+            else:
+                top_logs[url] = 1
+
+    if slow_queries:
+        top_slowest = [int(top_logs[key]['time']/top_logs[key]['count']) for key in top_logs]
+        top_slowest.sort(reverse=True)
+        return top_slowest[:5]
+    else:
+        top_popular = [top_logs[key] for key in top_logs]
+        top_popular.sort(reverse=True)
+        return top_popular[:5]
 
 
 if __name__ == '__main__':
