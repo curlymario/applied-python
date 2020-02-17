@@ -24,7 +24,7 @@ class TimeInterval:
         return self._end - self._begin
 
     def __repr__(self):
-        return 'TimeInterval({}, {})'.format(repr(self._begin), repr(self._end))
+        return 'TimeInterval({!r}, {!r})'.format(self._begin, self._end)
 
     def __str__(self):
         return '{} -> {}'.format(self._begin, self._end)
