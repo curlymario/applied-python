@@ -4,6 +4,15 @@ class TextHistory:
         self._version = 0
         self._actions = []
 
+    def _check_pos(self, pos):
+        if not isinstance(pos, int):
+            raise ValueError('Position must be integer')
+        if pos < 0 and pos != -1:
+            raise ValueError("""Please use "-1" or skip `pos` argument to work with the end of string.
+                             Otherwise, use positive integer for `pos` argument""")
+        if len(self._text) < pos:
+            raise ValueError('Text is smaller than the suggested position')
+
     @property
     def text(self) -> str:
         """
@@ -24,7 +33,8 @@ class TextHistory:
         Кидает ValueError, если указана недопустимая позиция.
         Возвращает номер новой версии.
         """
-        pass
+        self._check_pos(pos)
+
 
     def replace(self, text, pos=-1) -> int:
         """
@@ -33,14 +43,15 @@ class TextHistory:
         Замена за пределами строки работает как вставка (т. е. текст дописывается).
         Возвращает номер новой версии
         """
-        pass
+        self._check_pos(pos)
+
 
     def delete(self, pos, length) -> int:
         """
         удаляет length символов начиная с позиции pos.
         Возвращает номер новой версии.
         """
-        pass
+        self._check_pos(pos)
 
     def action(self, action) -> int:
         """
@@ -64,7 +75,8 @@ class Action:
     Если версии указаны неверно, кидается ValueError.
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
-    def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=-1):
+    def __init__(self, original_text='', pos=-1, text='', length=0, from_version=0, to_version=-1):
+        self._original_text = original_text
         self.pos = pos
         self.text = text
         self.length = length
