@@ -4,19 +4,21 @@ class TextHistory:
         self._version = 0
         self._actions = []
 
+    @property
     def text(self) -> str:
         """
         возвращает текущий текст, read only
         """
-        pass
+        return self._text
 
+    @property
     def version(self) -> int:
         """
         возвращает текущую версия, read only
         """
-        pass
+        return self._version
 
-    def insert(self, text, pos=pos) -> int:
+    def insert(self, text, pos=-1) -> int:
         """
         вставить текст с позиции pos (по умолчанию — конец строки).
         Кидает ValueError, если указана недопустимая позиция.
@@ -24,7 +26,7 @@ class TextHistory:
         """
         pass
 
-    def replace(self, text, pos=pos) -> int:
+    def replace(self, text, pos=-1) -> int:
         """
         заменить текст с позиции pos (по умолчанию — конец строки).
         Кидает ValueError, если указана недопустимая позиция.
@@ -48,7 +50,7 @@ class TextHistory:
         """
         pass
 
-    def get_actions(self, from_version=v1, to_version=v2) -> list:
+    def get_actions(self, from_version=0, to_version=-1) -> list:
         """
         возвращает list всех действий между двумя версиями
         """
