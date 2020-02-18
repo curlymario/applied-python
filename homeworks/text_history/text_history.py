@@ -64,16 +64,27 @@ class Action:
     Если версии указаны неверно, кидается ValueError.
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
-    pass
+    def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=-1):
+        self.pos = pos
+        self.text = text
+        self.length = length
+        self.from_version = from_version
+        self.to_version = to_version
+
+    def apply(self):
+        return self._action()
 
 
 class InsertAction(Action):
-    pass
+    def _action(self):
+        pass
 
 
 class ReplaceAction(Action):
-    pass
+    def _action(self):
+        pass
 
 
 class DeleteAction(Action):
-    pass
+    def _action(self):
+        pass
