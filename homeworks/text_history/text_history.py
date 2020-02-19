@@ -18,6 +18,19 @@ class TextHistory:
         """
         return self._version
 
+    def _check_versions(self, from_version, to_version, list=False):
+        if to_version is not None:
+            if from_version > to_version:
+                raise ValueError('Wrong version order')
+            if to_version < 0:
+                raise ValueError('Version can not be negative')
+            if list and to_version > len(self._actions):
+                raise ValueError('Incorrect `to_version` — no such version')
+        if from_version < 0:
+            raise ValueError('Version can not be negative')
+        if from_version > self._version:
+            raise ValueError('Incorrect `from_version` — no such version')
+
     def insert(self, text, pos=None) -> int:
         """
         вставить текст с позиции pos (по умолчанию — конец строки).
@@ -54,26 +67,13 @@ class TextHistory:
         self._version += 1
         return self._version
 
-    def check_versions(self, from_version, to_version, list=False):
-        if to_version is not None:
-            if from_version > to_version:
-                raise ValueError('Wrong version order')
-            if to_version < 0:
-                raise ValueError('Version can not be negative')
-            if list and to_version > len(self._actions):
-                raise ValueError('Incorrect `to_version` — no such version')
-        if from_version < 0:
-            raise ValueError('Version can not be negative')
-        if from_version > self._version:
-            raise ValueError('Incorrect `from_version` — no such version')
-
     def action(self, action) -> int:
         """
         применяет действие action.
         Возвращает номер новой версии.
         Версия растет не на 1, а устанавливается та, которая указана в action
         """
-        self.check_versions(action.from_version, action.to_version)
+        self._check_versions(action.from_version, action.to_version)
         self._actions.append(action)
         self._text = action.apply(self._text)
         self._version = action.to_version
@@ -84,7 +84,7 @@ class TextHistory:
         возвращает list всех действий между двумя версиями
         Если версии указаны неверно, кидается ValueError
         """
-        self.check_versions(from_version, to_version, list=True)
+        self._check_versions(from_version, to_version, list=True)
         if to_version is not None:
             return self._actions[from_version:to_version]
         else:
