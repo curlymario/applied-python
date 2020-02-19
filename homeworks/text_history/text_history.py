@@ -86,9 +86,9 @@ class TextHistory:
         """
         self.check_versions(from_version, to_version, list=True)
         if to_version is not None:
-            return self._actions[from_version+1:to_version+1]
+            return self._actions[from_version:to_version]
         else:
-            return self._actions[from_version+1:]
+            return self._actions[from_version:]
 
 
 class Action:
