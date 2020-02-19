@@ -34,7 +34,7 @@ class TextHistory:
         Возвращает номер новой версии.
         """
         self._check_pos(pos)
-
+        return self.version
 
     def replace(self, text, pos=-1) -> int:
         """
@@ -44,7 +44,7 @@ class TextHistory:
         Возвращает номер новой версии
         """
         self._check_pos(pos)
-
+        return self.version
 
     def delete(self, pos, length) -> int:
         """
@@ -52,6 +52,7 @@ class TextHistory:
         Возвращает номер новой версии.
         """
         self._check_pos(pos)
+        return self.version
 
     def action(self, action) -> int:
         """
@@ -60,12 +61,13 @@ class TextHistory:
         Версия растет не на 1, а устанавливается та, которая указана в action
         """
         pass
+        return self.version
 
     def get_actions(self, from_version=0, to_version=-1) -> list:
         """
         возвращает list всех действий между двумя версиями
         """
-        pass
+        return[]
 
 
 class Action:
@@ -75,28 +77,26 @@ class Action:
     Если версии указаны неверно, кидается ValueError.
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
-    def __init__(self, original_text='', pos=-1, text='', length=0, from_version=0, to_version=-1):
-        self._original_text = original_text
+    def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=-1):
         self.pos = pos
         self.text = text
         self.length = length
         self.from_version = from_version
         self.to_version = to_version
 
-    def apply(self):
-        return self._action()
+    def apply(self, str):
+        return self._action(str)
 
 
 class InsertAction(Action):
-    def _action(self):
-        pass
+    def _action(self, original_text):
+        return ''
 
 
 class ReplaceAction(Action):
-    def _action(self):
-        pass
-
+    def _action(self, original_text):
+        return ''
 
 class DeleteAction(Action):
-    def _action(self):
-        pass
+    def _action(self, original_text):
+        return ''
