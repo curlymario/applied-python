@@ -11,7 +11,16 @@ class Match:
     def __init__(self, holes, players):
         self._holes = holes
         self._players = players
+
         self._finished = False
+        self._current_hole = 0
+        self._current_player = 0
+        for player in self._players:
+            player.hits = 0
+
+        self._table = [[player.name for player in players]]+[[None]*len(players) for _ in range(holes)]
+        self._winners = set()
+
 
     def hit(self, success=False):
         """
@@ -19,7 +28,15 @@ class Match:
         Кидает RuntimeError, если матч завершен.
         success — булево значение, указываюшее, попал ли матч в лунку (по умолчанию False).
         """
-        pass
+        if self.finished:
+            raise RuntimeError('Матч завершён')
+
+        self._hit(success)
+
+        self._current_player += 1
+        if self._current_player == len(self._players):
+            self._current_player = 0
+
 
     @property
     def finished(self):
@@ -33,7 +50,10 @@ class Match:
         возвращает массив победителей в том же порядке, в которым игроки были переданы в конструктор.
         Кидает RuntimeError, если матч еще не завершен.
         """
-        pass
+        if not self.finished:
+            raise RuntimeError('Матч ещё идёт')
+        else:
+            return tuple(player.name for player in self._players if player in self._winners)
 
     def get_table(self):
         """
@@ -43,7 +63,7 @@ class Match:
         Если результата еще нет, то tuple содержит None
         (причем, если игрок совершил 3 удара, но еще не забил, то это все еще None, а не 3).
         """
-        pass
+        return [tuple(item for item in line) for line in self._table]
 
 
 class HitsMatch(Match):
@@ -54,7 +74,8 @@ class HitsMatch(Match):
     Каждый игрок получает столько очков, сколько ударов он потратил (соответственно, чем меньше очков, тем лучше).
     Десятый удар защитывается автоматически, игрок получает 10 очков, удар не требуется.
     """
-    pass
+    def _hit(self, success):
+        pass
 
 
 class HolesMatch(Match):
@@ -65,4 +86,5 @@ class HolesMatch(Match):
     Если хоть кто-то забил, то забившие получают 1 очко, промахнувшиеся – 0 очков, лунка более не разыгрывается.
     Если за десять таких кругов никто не забил, все получают 0 очков и переходят к следующей лунке.
     """
-    pass
+    def _hit(self, success):
+        pass
