@@ -18,7 +18,7 @@ class TextHistory:
         """
         return self._version
 
-    def insert(self, text, pos=-1) -> int:
+    def insert(self, text, pos=None) -> int:
         """
         вставить текст с позиции pos (по умолчанию — конец строки).
         Кидает ValueError, если указана недопустимая позиция.
@@ -30,7 +30,7 @@ class TextHistory:
         self._version += 1
         return self._version
 
-    def replace(self, text, pos=-1) -> int:
+    def replace(self, text, pos=None) -> int:
         """
         заменить текст с позиции pos (по умолчанию — конец строки).
         Кидает ValueError, если указана недопустимая позиция.
@@ -65,11 +65,15 @@ class TextHistory:
         self._version = action.to_version
         return self.version
 
-    def get_actions(self, from_version=0, to_version=-1) -> list:
+    def get_actions(self, from_version=0, to_version=None) -> list:
         """
         возвращает list всех действий между двумя версиями
+        Если версии указаны неверно, кидается ValueError
         """
-        return self._actions[from_version:to_version]
+        if to_version:
+            return self._actions[from_version:to_version+1]
+        else:
+            return self._actions[from_version:]
 
 
 class Action:
@@ -79,7 +83,7 @@ class Action:
     Если версии указаны неверно, кидается ValueError.
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
-    def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=-1):
+    def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=None):
         self.pos = pos
         self.text = text
         self.length = length
@@ -91,13 +95,14 @@ class Action:
         return self._action(str)
 
     def _check_pos(self, pos, str):
-        if not isinstance(pos, int):
-            raise ValueError('Position must be integer')
-        if pos < 0 and pos != -1:
-            raise ValueError("""Please use "-1" or skip `pos` argument to work with the end of string.
-                             Otherwise, use positive integer for `pos` argument""")
-        if len(str) < pos:
-            raise ValueError('Text is smaller than the suggested position')
+        if pos:
+            if not isinstance(pos, int):
+                raise ValueError('Position must be integer')
+            if pos < 0:
+                raise ValueError("""Please skip `pos` argument to work with the end of string.
+                                 Otherwise, use positive integer for `pos` argument""")
+            if len(str) < pos:
+                raise ValueError('No such `pos`. Text is smaller than the suggested position')
 
 
 class InsertAction(Action):
