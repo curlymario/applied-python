@@ -65,15 +65,28 @@ class TextHistory:
         self._version = action.to_version
         return self.version
 
+    @staticmethod
+    def check_versions(from_version, to_version):
+        if to_version:
+            if from_version > to_version:
+                raise ValueError('Wrong version order')
+            if to_version < 0:
+                raise ValueError('Version can not be negative')
+        if from_version < 0:
+            raise ValueError('Version can not be negative')
+
     def get_actions(self, from_version=0, to_version=None) -> list:
         """
         возвращает list всех действий между двумя версиями
         Если версии указаны неверно, кидается ValueError
         """
+        self.check_versions(from_version, to_version)
         if to_version:
-            return self._actions[from_version:to_version+1]
+            if to_version > len(self._actions):
+                raise ValueError('No such version')
+            return self._actions[from_version+1:to_version+1]
         else:
-            return self._actions[from_version:]
+            return self._actions[from_version+1:]
 
 
 class Action:
@@ -84,6 +97,7 @@ class Action:
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
     def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=None):
+        TextHistory.check_versions(from_version, to_version)
         self.pos = pos
         self.text = text
         self.length = length
