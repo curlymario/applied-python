@@ -153,5 +153,8 @@ class ReplaceAction(Action):
 
 class DeleteAction(Action):
     def _action(self, original_text):
-        new_text = ''.join([original_text[:self.pos], original_text[(self.pos + self.length):]])
-        return new_text
+        if self.length == 0:
+            return original_text
+        else:
+            new_text = ''.join([original_text[:self.pos], original_text[(self.pos + self.length):]])
+            return new_text
