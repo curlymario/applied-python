@@ -96,7 +96,7 @@ class Action:
     Если версии указаны неверно, кидается ValueError.
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
-    def __init__(self, pos=-1, text='', length=0, from_version=0, to_version=None):
+    def __init__(self, pos=None, text='', length=0, from_version=0, to_version=None):
         TextHistory.check_versions(from_version, to_version)
         self.pos = pos
         self.text = text
@@ -105,10 +105,10 @@ class Action:
         self.to_version = to_version
 
     def apply(self, str):
-        self._check_pos(self.pos, str)
+        self._check_pos(self.pos, self.length, str)
         return self._action(str)
 
-    def _check_pos(self, pos, str):
+    def _check_pos(self, pos, length, str):
         if pos:
             if not isinstance(pos, int):
                 raise ValueError('Position must be integer')
@@ -117,6 +117,9 @@ class Action:
                                  Otherwise, use positive integer for `pos` argument""")
             if len(str) < pos:
                 raise ValueError('No such `pos`. Text is smaller than the suggested position')
+            if length:
+                if pos+length > len(str):
+                    raise ValueError('End of text: Length is too big for this position')
 
 
 class InsertAction(Action):
