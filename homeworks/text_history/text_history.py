@@ -18,13 +18,13 @@ class TextHistory:
         """
         return self._version
 
-    def _check_versions(self, from_version, to_version, list=False):
+    def _check_versions(self, from_version, to_version, history=False):
         if to_version is not None:
             if from_version > to_version:
                 raise ValueError('Wrong version order')
             if to_version < 0:
                 raise ValueError('Version can not be negative')
-            if list and to_version > len(self._actions):
+            if history and to_version > len(self._actions):
                 raise ValueError('Incorrect `to_version` — no such version')
         if from_version < 0:
             raise ValueError('Version can not be negative')
@@ -104,7 +104,7 @@ class TextHistory:
         возвращает list всех действий между двумя версиями
         Если версии указаны неверно, кидается ValueError
         """
-        self._check_versions(from_version, to_version, list=True)
+        self._check_versions(from_version, to_version, history=True)
         if to_version is not None:
             return self._actions[from_version:to_version]
         else:
@@ -125,12 +125,12 @@ class Action:
         self.from_version = from_version
         self.to_version = to_version
 
-    def apply(self, str):
-        return self._action(str)
+    def apply(self, string):
+        return string
 
 
 class InsertAction(Action):
-    def _action(self, original_text):
+    def apply(self, original_text):
         if self.pos is None:
             new_text = ''.join([original_text, self.text])
         else:
@@ -139,7 +139,7 @@ class InsertAction(Action):
 
 
 class ReplaceAction(Action):
-    def _action(self, original_text):
+    def apply(self, original_text):
         if self.pos is None:
             new_text = ''.join([original_text, self.text])
         else:
@@ -152,7 +152,7 @@ class ReplaceAction(Action):
 
 
 class DeleteAction(Action):
-    def _action(self, original_text):
+    def apply(self, original_text):
         if self.length == 0:
             return original_text
         else:
