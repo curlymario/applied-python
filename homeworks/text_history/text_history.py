@@ -109,7 +109,7 @@ class Action:
         return self._action(str)
 
     def _check_pos(self, pos, length, str):
-        if pos:
+        if pos is not None:
             if not isinstance(pos, int):
                 raise ValueError('Position must be integer')
             if pos < 0:
@@ -124,14 +124,27 @@ class Action:
 
 class InsertAction(Action):
     def _action(self, original_text):
-        return original_text
+        if self.pos is None:
+            new_text = ''.join([original_text, self.text])
+        else:
+            new_text = ''.join([original_text[:self.pos], self.text, original_text[self.pos:]])
+        return new_text
 
 
 class ReplaceAction(Action):
     def _action(self, original_text):
-        return original_text
+        if self.pos is None:
+            new_text = ''.join([original_text, self.text])
+        else:
+            end_pos = self.pos + len(self.text)
+            if end_pos > len(original_text):
+                new_text = ''.join([original_text[:self.pos], self.text])
+            else:
+                new_text = ''.join([original_text[:self.pos], self.text, original_text[end_pos:]])
+        return new_text
 
 
 class DeleteAction(Action):
     def _action(self, original_text):
-        return original_text
+        new_text = ''.join([original_text[:self.pos], original_text[(self.pos + self.length):]])
+        return new_text
