@@ -31,12 +31,30 @@ class TextHistory:
         if from_version > self._version:
             raise ValueError('Incorrect `from_version` — no such version')
 
+    def _check_pos(self, pos, length=None):
+        if pos is None:
+            pos = len(self._text)
+            return pos
+        if pos is not None:
+            if not isinstance(pos, int):
+                raise ValueError('Position must be integer')
+            if pos < 0:
+                raise ValueError("""Please skip `pos` argument to work with the end of string.
+                                 Otherwise, use positive integer for `pos` argument""")
+            if len(self._text) < pos:
+                raise ValueError('No such `pos`. Text is smaller than the suggested position')
+            if length is not None:
+                if pos + length > len(self._text):
+                    raise ValueError('No such text. Delete size is to big or outside the text')
+        return pos
+
     def insert(self, text, pos=None) -> int:
         """
         вставить текст с позиции pos (по умолчанию — конец строки).
         Кидает ValueError, если указана недопустимая позиция.
         Возвращает номер новой версии.
         """
+        pos = self._check_pos(pos)
         action = InsertAction(pos=pos, text=text, from_version=self._version, to_version=self._version + 1)
         self._actions.append(action)
         self._text = action.apply(self._text)
@@ -50,17 +68,19 @@ class TextHistory:
         Замена за пределами строки работает как вставка (т. е. текст дописывается).
         Возвращает номер новой версии
         """
+        pos = self._check_pos(pos)
         action = ReplaceAction(pos=pos, text=text, from_version=self._version, to_version=self._version + 1)
         self._actions.append(action)
         self._text = action.apply(self._text)
         self._version += 1
         return self._version
 
-    def delete(self, pos, length) -> int:
+    def delete(self, pos=None, length=0) -> int:
         """
         удаляет length символов начиная с позиции pos.
         Возвращает номер новой версии.
         """
+        pos = self._check_pos(pos, length)
         action = DeleteAction(pos=pos, length=length, from_version=self._version, to_version=self._version + 1)
         self._actions.append(action)
         self._text = action.apply(self._text)
@@ -106,21 +126,7 @@ class Action:
         self.to_version = to_version
 
     def apply(self, str):
-        self._check_pos(self.pos, self.length, str)
         return self._action(str)
-
-    def _check_pos(self, pos, length, str):
-        if pos is not None:
-            if not isinstance(pos, int):
-                raise ValueError('Position must be integer')
-            if pos < 0:
-                raise ValueError("""Please skip `pos` argument to work with the end of string.
-                                 Otherwise, use positive integer for `pos` argument""")
-            if len(str) < pos:
-                raise ValueError('No such `pos`. Text is smaller than the suggested position')
-            if length:
-                if pos+length > len(str):
-                    raise ValueError('End of text: Length is too big for this position')
 
 
 class InsertAction(Action):
