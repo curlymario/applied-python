@@ -4,15 +4,6 @@ class TextHistory:
         self._version = 0
         self._actions = []
 
-    def _check_pos(self, pos):
-        if not isinstance(pos, int):
-            raise ValueError('Position must be integer')
-        if pos < 0 and pos != -1:
-            raise ValueError("""Please use "-1" or skip `pos` argument to work with the end of string.
-                             Otherwise, use positive integer for `pos` argument""")
-        if len(self._text) < pos:
-            raise ValueError('Text is smaller than the suggested position')
-
     @property
     def text(self) -> str:
         """
@@ -33,8 +24,11 @@ class TextHistory:
         Кидает ValueError, если указана недопустимая позиция.
         Возвращает номер новой версии.
         """
-        self._check_pos(pos)
-        return self.version
+        action = InsertAction(pos=pos, text=text, from_version=self._version, to_version=self._version + 1)
+        self._actions.append(action)
+        self._text = action.apply(self._text)
+        self._version += 1
+        return self._version
 
     def replace(self, text, pos=-1) -> int:
         """
@@ -43,16 +37,22 @@ class TextHistory:
         Замена за пределами строки работает как вставка (т. е. текст дописывается).
         Возвращает номер новой версии
         """
-        self._check_pos(pos)
-        return self.version
+        action = ReplaceAction(pos=pos, text=text, from_version=self._version, to_version=self._version + 1)
+        self._actions.append(action)
+        self._text = action.apply(self._text)
+        self._version += 1
+        return self._version
 
     def delete(self, pos, length) -> int:
         """
         удаляет length символов начиная с позиции pos.
         Возвращает номер новой версии.
         """
-        self._check_pos(pos)
-        return self.version
+        action = DeleteAction(pos=pos, length=length, from_version=self._version, to_version=self._version + 1)
+        self._actions.append(action)
+        self._text = action.apply(self._text)
+        self._version += 1
+        return self._version
 
     def action(self, action) -> int:
         """
@@ -60,14 +60,16 @@ class TextHistory:
         Возвращает номер новой версии.
         Версия растет не на 1, а устанавливается та, которая указана в action
         """
-        pass
+        self._actions.append(action)
+        self._text = action.apply(self._text)
+        self._version = action.to_version
         return self.version
 
     def get_actions(self, from_version=0, to_version=-1) -> list:
         """
         возвращает list всех действий между двумя версиями
         """
-        return[]
+        return self._actions[from_version:to_version]
 
 
 class Action:
@@ -85,18 +87,29 @@ class Action:
         self.to_version = to_version
 
     def apply(self, str):
+        self._check_pos(self.pos, str)
         return self._action(str)
+
+    def _check_pos(self, pos, str):
+        if not isinstance(pos, int):
+            raise ValueError('Position must be integer')
+        if pos < 0 and pos != -1:
+            raise ValueError("""Please use "-1" or skip `pos` argument to work with the end of string.
+                             Otherwise, use positive integer for `pos` argument""")
+        if len(str) < pos:
+            raise ValueError('Text is smaller than the suggested position')
 
 
 class InsertAction(Action):
     def _action(self, original_text):
-        return ''
+        return original_text
 
 
 class ReplaceAction(Action):
     def _action(self, original_text):
-        return ''
+        return original_text
+
 
 class DeleteAction(Action):
     def _action(self, original_text):
-        return ''
+        return original_text
