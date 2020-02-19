@@ -54,36 +54,38 @@ class TextHistory:
         self._version += 1
         return self._version
 
+    def check_versions(self, from_version, to_version, list=False):
+        if to_version is not None:
+            if from_version > to_version:
+                raise ValueError('Wrong version order')
+            if to_version < 0:
+                raise ValueError('Version can not be negative')
+            if list and to_version > len(self._actions):
+                raise ValueError('Incorrect `to_version` — no such version')
+        if from_version < 0:
+            raise ValueError('Version can not be negative')
+        if from_version > self._version:
+            raise ValueError('Incorrect `from_version` — no such version')
+
     def action(self, action) -> int:
         """
         применяет действие action.
         Возвращает номер новой версии.
         Версия растет не на 1, а устанавливается та, которая указана в action
         """
+        self.check_versions(action.from_version, action.to_version)
         self._actions.append(action)
         self._text = action.apply(self._text)
         self._version = action.to_version
         return self.version
-
-    @staticmethod
-    def check_versions(from_version, to_version):
-        if to_version:
-            if from_version > to_version:
-                raise ValueError('Wrong version order')
-            if to_version < 0:
-                raise ValueError('Version can not be negative')
-        if from_version < 0:
-            raise ValueError('Version can not be negative')
 
     def get_actions(self, from_version=0, to_version=None) -> list:
         """
         возвращает list всех действий между двумя версиями
         Если версии указаны неверно, кидается ValueError
         """
-        self.check_versions(from_version, to_version)
-        if to_version:
-            if to_version > len(self._actions):
-                raise ValueError('No such version')
+        self.check_versions(from_version, to_version, list=True)
+        if to_version is not None:
             return self._actions[from_version+1:to_version+1]
         else:
             return self._actions[from_version+1:]
@@ -97,7 +99,6 @@ class Action:
     Единственный публичный метод apply принимает строку и возвращает модифицированную строку.
     """
     def __init__(self, pos=None, text='', length=0, from_version=0, to_version=None):
-        TextHistory.check_versions(from_version, to_version)
         self.pos = pos
         self.text = text
         self.length = length
