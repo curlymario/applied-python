@@ -19,6 +19,7 @@ class Match:
         self._tick = 0
         for player in self._players:
             player.score = 0
+            player.total_score = 0
 
         self._table = [[player.name for player in players]]+[[None]*len(players) for _ in range(holes)]
         self._winners = set()
@@ -30,6 +31,10 @@ class Match:
     def _next_player(self):
         self._current_player += 1
         self._wrap_players_list()
+
+    def _save_player_results(self, player):
+        self._table[self._current_hole + 1][self._current_player] = player.score
+        player.total_score += player.score
 
     def hit(self, success=False):
         """
@@ -60,7 +65,7 @@ class Match:
         if not self.finished:
             raise RuntimeError('Матч ещё идёт')
         else:
-            return tuple(player.name for player in self._players if player in self._winners)
+            return [player for player in self._players if player in self._winners]
 
     def get_table(self):
         """
@@ -86,6 +91,15 @@ class HitsMatch(Match):
         Match.__init__(self, holes, players)
         self._playing = set(players)
 
+    def _calculate_winner(self):
+        winner = min(self._players, key=lambda x: x.total_score)
+        self._winners.add(winner)
+        for player in self._players:
+            if player not in self._winners:
+                if player.total_score == winner.total_score:
+                    self._winners.add(player)
+
+
     def _hit(self, success):
         self._tick += 1
         print(self._tick)
@@ -106,14 +120,15 @@ class HitsMatch(Match):
         if success:
             player.success = True
             player.score += 1
-            self._table[self._current_hole + 1][self._current_player] = player.score
+            self._save_player_results(player)
             self._playing.remove(player)
             print(str(self._current_player) + ' ' + player.name + ' has finished succesfully\n')
 
         else:
             print(str(self._current_player) + ' ' + player.name + ' missed\n')
             if self._current_round == 8:
-                self._table[self._current_hole + 1][self._current_player] = 10
+                player.score = 10
+                self._save_player_results(player)
                 self._playing.remove(player)
                 print(str(self._current_player) + ' ' + player.name + ' could not finish\n')
             else:
@@ -125,6 +140,7 @@ class HitsMatch(Match):
             self._current_hole += 1
             if self._current_hole == self._holes:
                 self._finished = True
+                self._calculate_winner()
             else:
                 self._current_player = self._current_hole
                 self._wrap_players_list()
