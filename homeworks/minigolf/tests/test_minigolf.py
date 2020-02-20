@@ -77,7 +77,7 @@ class HitsMatchTestCase(TestCase):
 
     def test_final_winners(self):
         self.assertEqual(self.m.get_winners(), [
-            players[0], players[2]
+            self.players[0], self.players[2]
         ])
 
 
