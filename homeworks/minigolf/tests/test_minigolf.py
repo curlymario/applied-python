@@ -4,20 +4,43 @@ from minigolf import HitsMatch, HolesMatch, Player
 
 
 class HitsMatchTestCase(TestCase):
-    players = [Player('A'), Player('B'), Player('C')]
-    m = HitsMatch(3, players)
+    def setUp(self):
+        self.players = [Player('A'), Player('B'), Player('C')]
+        self.m = HitsMatch(3, self.players)
 
-    m.hit()  # 1
-    m.hit()  # 2
-    m.hit(True)  # 3
-    m.hit(True)  # 1
-    for _ in range(8):
-        m.hit()  # 2
+    def tearDown(self):
+        self.players = None
+        self.m = None
+
+    def _first_hole_hits(self):
+        self.m.hit()  # 1
+        self.m.hit()  # 2
+        self.m.hit(True)  # 3
+        self.m.hit(True)  # 1
+        for _ in range(8):
+            self.m.hit()  # 2
+
+    def _second_hole_hits(self):
+        self.m.hit()  # 2
+        for _ in range(3):
+            self.m.hit(True)  # 3, 1, 2
+
+    def _third_hole_hits_one(self):
+        self.m.hit()  # 3
+        self.m.hit(True)  # 1
+        self.m.hit()  # 2
+
+    def _third_hole_hits_two(self):
+        self.m.hit(True)  # 3
+        self.m.hit()  # 2
+        self.m.hit(True)  # 2
 
     def test_first_hole__not_finished(self):
+        self._first_hole_hits()
         self.assertFalse(self.m.finished)
 
     def test_first_hole__get_table(self):
+        self._first_hole_hits()
         self.assertEqual(self.m.get_table(), [
             ('A', 'B', 'C'),
             (2, 10, 1),
@@ -25,14 +48,14 @@ class HitsMatchTestCase(TestCase):
             (None, None, None),
         ])
 
-    m.hit()  # 2
-    for _ in range(3):
-        m.hit(True)  # 3, 1, 2
-
     def test_second_hole__not_finished(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
         self.assertFalse(self.m.finished)
 
     def test_second_hole__get_table(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
         self.assertEqual(self.m.get_table(), [
             ('A', 'B', 'C'),
             (2, 10, 1),
@@ -41,14 +64,15 @@ class HitsMatchTestCase(TestCase):
         ])
 
     def test_second_hole__no_winners(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
         with self.assertRaises(RuntimeError):
             self.m.get_winners()
 
-    m.hit()  # 3
-    m.hit(True)  # 1
-    m.hit()  # 2
-
     def test_third_hole__get_table(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
+        self._third_hole_hits_one()
         self.assertEqual(self.m.get_table(), [
             ('A', 'B', 'C'),
             (2, 10, 1),
@@ -56,14 +80,18 @@ class HitsMatchTestCase(TestCase):
             (1, None, None),
         ])
 
-    m.hit(True)  # 3
-    m.hit()  # 2
-    m.hit(True)  # 2
-
     def test_third_hole__finished(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
+        self._third_hole_hits_one()
+        self._third_hole_hits_two()
         self.assertTrue(self.m.finished)
 
     def test_third_hole__get_table_last(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
+        self._third_hole_hits_one()
+        self._third_hole_hits_two()
         self.assertEqual(self.m.get_table(), [
             ('A', 'B', 'C'),
             (2, 10, 1),
@@ -72,10 +100,18 @@ class HitsMatchTestCase(TestCase):
         ])
 
     def test_no_more_hits(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
+        self._third_hole_hits_one()
+        self._third_hole_hits_two()
         with self.assertRaises(RuntimeError):
             self.m.hit()
 
     def test_final_winners(self):
+        self._first_hole_hits()
+        self._second_hole_hits()
+        self._third_hole_hits_one()
+        self._third_hole_hits_two()
         self.assertEqual(self.m.get_winners(), [
             self.players[0], self.players[2]
         ])
