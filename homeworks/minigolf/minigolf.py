@@ -44,9 +44,6 @@ class Match:
         self._playing = set(self._players)
         for player in self._players:
             player.score = 0
-        print(self.get_table())
-        print('===========================\nNew hole!\n' + str(self._current_player) + ' ' + self._players[
-            self._current_player].name + ' starts \n')
 
     def hit(self, success=False):
         """
@@ -113,35 +110,25 @@ class HitsMatch(Match):
 
     def _hit(self, success):
         self._tick += 1
-        print(self._tick)
 
         player = self._players[self._current_player]
         while self._playing and player not in self._playing:
-            print('skip player ' + str(self._current_player) + ' ' + player.name)
             self._next_player()
             if self._tick >= len(self._players):
                 self._current_round += 1
                 self._tick = 0
-                print('------\nnew round ' + str(self._current_round) + ' in hole ' + str(self._current_hole) + '\n')
             self._tick += 1
-            print(self._tick)
             player = self._players[self._current_player]
-
-        print(str(self._current_player) + ' ' + player.name + ' hits')
         if success:
             player.success = True
             player.score += 1
             self._save_player_results(player)
             self._playing.remove(player)
-            print(str(self._current_player) + ' ' + player.name + ' has finished succesfully\n')
-
         else:
-            print(str(self._current_player) + ' ' + player.name + ' missed\n')
             if self._current_round == 8:
                 player.score = 10
                 self._save_player_results(player)
                 self._playing.remove(player)
-                print(str(self._current_player) + ' ' + player.name + ' could not finish\n')
             else:
                 player.score += 1
 
@@ -158,7 +145,6 @@ class HitsMatch(Match):
         if self._tick >= len(self._players):
             self._tick = 0
             self._current_round += 1
-            print('------\nnew round ' + str(self._current_round) + ' in hole ' + str(self._current_hole) + '\n')
 
 class HolesMatch(Match):
     """
