@@ -1,6 +1,8 @@
 class Player:
     def __init__(self, name):
         self._name = name
+        self.score = 0
+        self.total_score = 0
 
     @property
     def name(self):
@@ -37,7 +39,7 @@ class Match:
         player.total_score += player.score
 
     def _start_new_hole(self):
-        self._current_player = self._current_hole
+        self._current_player = self._current_hole - 1
         self._wrap_players_list()
         self._playing = set(self._players)
         for player in self._players:
