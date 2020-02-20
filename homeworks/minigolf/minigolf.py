@@ -36,6 +36,16 @@ class Match:
         self._table[self._current_hole + 1][self._current_player] = player.score
         player.total_score += player.score
 
+    def _start_new_hole(self):
+        self._current_player = self._current_hole
+        self._wrap_players_list()
+        self._playing = set(self._players)
+        for player in self._players:
+            player.score = 0
+        print(self.get_table())
+        print('===========================\nNew hole!\n' + str(self._current_player) + ' ' + self._players[
+            self._current_player].name + ' starts \n')
+
     def hit(self, success=False):
         """
         сообщает матчу, что произошел очередной удар.
@@ -99,7 +109,6 @@ class HitsMatch(Match):
                 if player.total_score == winner.total_score:
                     self._winners.add(player)
 
-
     def _hit(self, success):
         self._tick += 1
         print(self._tick)
@@ -142,10 +151,7 @@ class HitsMatch(Match):
                 self._finished = True
                 self._calculate_winner()
             else:
-                self._current_player = self._current_hole
-                self._wrap_players_list()
-                self._playing = set(self._players)
-                print('===========================\nNew hole!\n' + str(self._current_player) + ' ' + self._players[self._current_player].name + ' starts \n')
+                self._start_new_hole()
 
         if self._tick >= len(self._players):
             self._tick = 0
