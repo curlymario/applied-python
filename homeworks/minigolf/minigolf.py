@@ -123,7 +123,7 @@ class HitsMatch(Match):
             self._tick = 0
             self._current_round = 0
             self._current_hole += 1
-            if self._current_hole > self._holes:
+            if self._current_hole == self._holes:
                 self._finished = True
             else:
                 self._current_player = self._current_hole
