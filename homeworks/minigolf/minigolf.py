@@ -154,10 +154,42 @@ class HolesMatch(Match):
     Если хоть кто-то забил, то забившие получают 1 очко, промахнувшиеся – 0 очков, лунка более не разыгрывается.
     Если за десять таких кругов никто не забил, все получают 0 очков и переходят к следующей лунке.
     """
+    def __init__(self, holes, players):
+        Match.__init__(self, holes, players)
+        self._hole_finished = False
+
     def _calculate_winner(self):
         winner = max(self._players, key=lambda x: x.total_score)
         self._winners.add(winner)
         self._check_other_winners(winner)
 
     def _hit(self, success):
-        pass
+        self._tick += 1
+        print(str(self._tick))
+
+        player = self._players[self._current_player]
+
+        print('Player {} {} hits'.format(str(self._current_player), player.name))
+
+        if success:
+            print('Success!\n')
+
+            player.score += 1
+            self._save_player_results(player)
+            self._hole_finished = True
+        else:
+            print('Miss!\n')
+
+        if self._tick >= len(self._players):
+            self._tick = 0
+            self._current_round += 1
+            if self._hole_finished:
+                self._end_hole()
+                print('==========\nNew hole {}'.format(str(self._current_hole)))
+            elif self._current_round == 10:
+                self._end_hole()
+                print('No one hit!\n==========\nNew hole {}'.format(str(self._current_hole)))
+            else:
+                print('---------\nNew round {}'.format(str(self._current_round)))
+
+        self._next_player()
