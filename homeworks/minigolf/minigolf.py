@@ -123,7 +123,6 @@ class HitsMatch(Match):
             self._tick += 1
             player = self._players[self._current_player]
         if success:
-            player.success = True
             player.score += 1
             self._save_player_results(player)
             self._playing.remove(player)
