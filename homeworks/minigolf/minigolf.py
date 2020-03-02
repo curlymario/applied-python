@@ -40,10 +40,6 @@ class Match:
         self._current_player += 1
         self._wrap_players_list()
 
-    def _save_player_results(self, player):
-        self._table[self._current_hole + 1][self._current_player] = player.score
-        player.total_score += player.score
-
     def _start_new_hole(self):
         self._current_player = self._current_hole - 1
         self._wrap_players_list()
@@ -106,6 +102,10 @@ class HitsMatch(Match):
         self._winners.add(winner)
         self._check_other_winners(winner)
 
+    def _save_player_results(self, player):
+        self._table[self._current_hole + 1][self._current_player] = player.score
+        player.total_score += player.score
+
     def _hit(self, success):
         self._tick += 1
 
@@ -158,10 +158,29 @@ class HolesMatch(Match):
         Match.__init__(self, holes, players)
         self._hole_finished = False
 
+    def _save_player_results(self, i, player):
+        self._table[self._current_hole + 1][i] = player.score
+        player.total_score += player.score
+
     def _calculate_winner(self):
         winner = max(self._players, key=lambda x: x.total_score)
         self._winners.add(winner)
         self._check_other_winners(winner)
+
+    def _end_hole(self):
+        for i, player in enumerate(self._players):
+            if player.score != 1:
+                player.score = 0
+                self._save_player_results(i, player)
+        self._tick = 0
+        self._current_round = 0
+        self._current_hole += 1
+        self._hole_finished = False
+        if self._current_hole != self._holes:
+            self._start_new_hole()
+        else:
+            self._finished = True
+            self._calculate_winner()
 
     def _hit(self, success):
         self._tick += 1
@@ -175,7 +194,7 @@ class HolesMatch(Match):
             print('Success!\n')
 
             player.score += 1
-            self._save_player_results(player)
+            self._save_player_results(self._current_player, player)
             self._hole_finished = True
         else:
             print('Miss!\n')
