@@ -26,6 +26,12 @@ class Match:
         self._table = [[player.name for player in players]]+[[None]*len(players) for _ in range(holes)]
         self._winners = set()
 
+    def _check_other_winners(self, winner):
+        for player in self._players:
+            if player not in self._winners:
+                if player.total_score == winner.total_score:
+                    self._winners.add(player)
+
     def _wrap_players_list(self):
         while self._current_player >= len(self._players):
             self._current_player -= len(self._players)
@@ -103,10 +109,7 @@ class HitsMatch(Match):
     def _calculate_winner(self):
         winner = min(self._players, key=lambda x: x.total_score)
         self._winners.add(winner)
-        for player in self._players:
-            if player not in self._winners:
-                if player.total_score == winner.total_score:
-                    self._winners.add(player)
+        self._check_other_winners(winner)
 
     def _hit(self, success):
         self._tick += 1
@@ -154,5 +157,10 @@ class HolesMatch(Match):
     Если хоть кто-то забил, то забившие получают 1 очко, промахнувшиеся – 0 очков, лунка более не разыгрывается.
     Если за десять таких кругов никто не забил, все получают 0 очков и переходят к следующей лунке.
     """
+    def _calculate_winner(self):
+        winner = max(self._players, key=lambda x: x.total_score)
+        self._winners.add(winner)
+        self._check_other_winners(winner)
+
     def _hit(self, success):
         pass
