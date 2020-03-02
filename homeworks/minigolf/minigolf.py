@@ -47,7 +47,6 @@ class Match:
     def _start_new_hole(self):
         self._current_player = self._current_hole - 1
         self._wrap_players_list()
-        self._playing = set(self._players)
         for player in self._players:
             player.score = 0
 
@@ -143,6 +142,7 @@ class HitsMatch(Match):
                 self._calculate_winner()
             else:
                 self._start_new_hole()
+                self._playing = set(self._players)
 
         if self._tick >= len(self._players):
             self._tick = 0
