@@ -120,7 +120,7 @@ class HitsMatchTestCase(TestCase):
 class HolesMatchTestCase(TestCase):
     def setUp(self):
         self.players = [Player('A'), Player('B'), Player('C')]
-        self.m = HitsMatch(3, self.players)
+        self.m = HolesMatch(3, self.players)
 
     def tearDown(self):
         self.players = None
