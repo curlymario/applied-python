@@ -60,10 +60,6 @@ class Match:
             raise RuntimeError('Матч завершён')
         self._hit(success)
 
-        self._current_player += 1
-        if self._current_player == len(self._players):
-            self._current_player = 0
-
     @property
     def finished(self):
         """
@@ -147,6 +143,8 @@ class HitsMatch(Match):
         if self._tick >= len(self._players):
             self._tick = 0
             self._current_round += 1
+
+        self._next_player()
 
 class HolesMatch(Match):
     """
