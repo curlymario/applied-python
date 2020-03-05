@@ -11,21 +11,29 @@ class Task:
 
 class TaskQueue(deque):
 
+    def __init__(self):
+        deque.__init__(self)
+        self._open_tasks = 0
+
     def _gen_task_id(self, task):
         pass
 
     def add_new_task(self, task):
+        self._open_tasks += 1
         task_id = self._gen_task_id(task)
         self.append((task_id, task))
         return task_id
 
     def get_next_task(self):
+        if self._open_tasks == 0:
+            return None
         i = 0
         task_id, task = *self[i]
         while task.in_use:
             i += 1
             task_id, task = *self[i]
         task.in_use = True
+        self._open_tasks -= 1
         return task_id, task
 
     def find_task(self, task_id):
