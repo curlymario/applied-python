@@ -37,8 +37,8 @@ class TaskQueue(deque):
         return task_id, task
 
     def find_task(self, task_id):
-        for _ in self:
-            if _[0] == task_id:
+        for task_entry in self:
+            if task_entry[0] == task_id:
                 return True
         return False
 
