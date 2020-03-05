@@ -34,6 +34,14 @@ class TaskQueue(deque):
                 return True
         return False
 
+    def finish_task(self, task_id):
+        for task_entry in self:
+            if task_entry[0] == task_id:
+                self.remove(task_entry)
+                return True
+        return False
+
+
 class TaskQueueServer:
 
     def __init__(self, ip, port, path, timeout):
