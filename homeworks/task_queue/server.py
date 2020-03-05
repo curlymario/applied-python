@@ -2,19 +2,24 @@ from collections import deque
 import argparse
 
 class Task:
-    pass
+    __slots__ = ('length', 'data', 'in_use')
+
+    def __init__(self, length, data):
+        self.length = length
+        self.data = data
+        self.in_use = False
 
 class TaskQueue(deque):
 
     def _gen_task_id(self, task):
         pass
 
-    def add(self, task):
+    def add_new_task(self, task):
         task_id = self._gen_task_id(task)
         self.append((task_id, task))
         return task_id
 
-    def get(self):
+    def get_next_task(self):
         i = 0
         task_id, task = *self[i]
         while task.in_use:
@@ -22,6 +27,12 @@ class TaskQueue(deque):
             task_id, task = *self[i]
         task.in_use = True
         return task_id, task
+
+    def find_task(self, task_id):
+        for _ in self:
+            if _[0] == task_id:
+                return True
+        return False
 
 class TaskQueueServer:
 
