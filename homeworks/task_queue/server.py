@@ -1,5 +1,27 @@
-
+from collections import deque
 import argparse
+
+class Task:
+    pass
+
+class TaskQueue(deque):
+
+    def _gen_task_id(self, task):
+        pass
+
+    def add(self, task):
+        task_id = self._gen_task_id(task)
+        self.append((task_id, task))
+        return task_id
+
+    def get(self):
+        i = 0
+        task_id, task = *self[i]
+        while task.in_use:
+            i += 1
+            task_id, task = *self[i]
+        task.in_use = True
+        return task_id, task
 
 class TaskQueueServer:
 
