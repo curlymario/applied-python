@@ -16,7 +16,12 @@ class TaskQueue(deque):
         self._open_tasks = 0
 
     def _gen_task_id(self, task):
-        pass
+        if task.length > 128:
+            task_id = str(task.data[:128])
+        else:
+            task_id = str(task.data)
+        task_id = task_id.replace(' ', '')
+        return task_id
 
     def add_new_task(self, task):
         self._open_tasks += 1
