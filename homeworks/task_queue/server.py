@@ -88,27 +88,31 @@ class TaskQueueServer:
                         self._queues[queue_name] = queue
                     else:
                         queue = self._queues[queue_name]
-                    length, data = command[2], command[3]
-                    return queue.add_new_task(Task(length, data))
+                        length, data = command[2], command[3]
+                        answer = queue.add_new_task(Task(length, data))
 
                 #TODO: add timeout check
-                if command_name == b'GET':
+                elif command_name == b'GET':
                     if queue_name not in self._queues:
-                        return b'NONE'
-                    queue = self._queues[queue_name]
-                    if len(queue) == 0:
-                        return b'NONE'
+                        answer = b'NONE'
+                    else:
+                        queue = self._queues[queue_name]
+                        if len(queue) != 0:
+                            task_id, task = queue.get_next_task()
+                            answer = b' '.join((task_id, task.length, task.data))
+                        else:
+                            answer = b'NONE'
 
-                    task_id, task = queue.get_next_task()
-                    return b' '.join((task_id, task.length, task.data))
-
-                if command_name == b'ACK':
+                elif command_name == b'ACK':
                     if queue_name not in self._queues:
-                        return b'NO'
-                    queue = self._queues[queue_name]
-                    task_id = command[2]
-                    return b'YES' if queue.find_task(task_id) else b'NO'
+                        answer = b'NO'
+                    else:
+                        queue = self._queues[queue_name]
+                        task_id = command[2]
+                        answer = b'YES' if queue.find_task(task_id) else b'NO'
 
+                connection.send(answer)
+                connection.close()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='This is a simple task queue server with custom protocol')
