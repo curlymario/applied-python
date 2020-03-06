@@ -62,6 +62,7 @@ class TaskQueueServer:
         self.port = port
         self.path = path
         self.timeout = timeout
+        self._queues = {}
 
     def run(self):
         connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,10 +72,17 @@ class TaskQueueServer:
         while True:
             current_connection, address = connection.accept()
             while True:
-                command = current_connection.recv(1000000)
+                command = current_connection.recv(1000000).split(b' ')
+                command_name = command[0]
+                queue_name = command[1]
 
-                if command == b'':
-                    break
+                if queue_name not in self._queues:
+                    queue = TaskQueue()
+                    self._queues[queue_name] = queue
+
+                if command_name == b'ADD':
+                    length, data = command[2], command[3]
+                    return queue.add_new_task(Task(length, data))
 
 
 def parse_args():
