@@ -1,5 +1,6 @@
 from collections import deque
 import argparse
+import socket
 
 class Task:
     __slots__ = ('length', 'data', 'in_use')
@@ -58,10 +59,24 @@ class TaskQueue(deque):
 class TaskQueueServer:
 
     def __init__(self, ip, port, path, timeout):
-        pass
+        self.ip = ip
+        self.port = port
+        self.path = path
+        self.timeout = timeout
 
     def run(self):
-        pass
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        connection.bind((self.ip, self.port))
+        connection.listen()
+        while True:
+            current_connection, address = connection.accept()
+            while True:
+                command = current_connection.recv(1000000)
+
+                if command == b'':
+                    break
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='This is a simple task queue server with custom protocol')
