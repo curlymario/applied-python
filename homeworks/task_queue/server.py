@@ -96,7 +96,7 @@ class TaskQueueServer:
                         return b'NONE'
 
                     task_id, task = queue.get_next_task()
-                    return b' '.join(task_id, task.length, task.data)
+                    return b' '.join((task_id, task.length, task.data))
 
 
 def parse_args():
