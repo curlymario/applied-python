@@ -2,6 +2,7 @@ from collections import deque
 import argparse
 import socket
 
+
 class Task:
     __slots__ = ('length', 'data', 'in_use')
 
@@ -9,6 +10,7 @@ class Task:
         self.length = length
         self.data = data
         self.in_use = False
+
 
 class TaskQueue(deque):
 
@@ -130,6 +132,7 @@ def parse_args():
         default=300,
         help='Task maximum GET timeout in seconds')
     return parser.parse_args()
+
 
 if __name__ == '__main__':
     args = parse_args()
