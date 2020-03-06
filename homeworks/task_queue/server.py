@@ -21,7 +21,6 @@ class TaskQueue(deque):
             task_id = str(task.data[:128])
         else:
             task_id = str(task.data)
-        task_id = task_id.replace(' ', '')
         return task_id
 
     def add_new_task(self, task):
