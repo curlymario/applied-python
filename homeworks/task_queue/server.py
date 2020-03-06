@@ -91,6 +91,7 @@ class TaskQueueServer:
                     length, data = command[2], command[3]
                     return queue.add_new_task(Task(length, data))
 
+                #TODO: add timeout check
                 if command_name == b'GET':
                     if queue_name not in self._queues:
                         return b'NONE'
@@ -100,6 +101,13 @@ class TaskQueueServer:
 
                     task_id, task = queue.get_next_task()
                     return b' '.join((task_id, task.length, task.data))
+
+                if command_name == b'ACK':
+                    if queue_name not in self._queues:
+                        return b'NO'
+                    queue = self._queues[queue_name]
+                    task_id = command[2]
+                    return b'YES' if queue.find_task(task_id) else b'NO'
 
 
 def parse_args():
