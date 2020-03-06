@@ -54,6 +54,9 @@ class TaskQueue(deque):
                 return True
         return False
 
+    def __len__(self):
+        return self._open_tasks
+
 
 class TaskQueueServer:
 
@@ -76,11 +79,10 @@ class TaskQueueServer:
                 command_name = command[0]
                 queue_name = command[1]
 
-                if queue_name not in self._queues:
-                    queue = TaskQueue()
-                    self._queues[queue_name] = queue
-
                 if command_name == b'ADD':
+                    if queue_name not in self._queues:
+                        queue = TaskQueue()
+                        self._queues[queue_name] = queue
                     length, data = command[2], command[3]
                     return queue.add_new_task(Task(length, data))
 
