@@ -18,7 +18,8 @@ class TaskQueue(deque):
         deque.__init__(self)
         self._open_tasks = 0
 
-    def _gen_task_id(self, task):
+    @staticmethod
+    def _gen_task_id(task):
         if task.length > 128:
             task_id = str(task.data[:128])
         else:
