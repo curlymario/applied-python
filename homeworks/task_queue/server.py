@@ -83,6 +83,8 @@ class TaskQueueServer:
                     if queue_name not in self._queues:
                         queue = TaskQueue()
                         self._queues[queue_name] = queue
+                    else:
+                        queue = self._queues[queue_name]
                     length, data = command[2], command[3]
                     return queue.add_new_task(Task(length, data))
 
