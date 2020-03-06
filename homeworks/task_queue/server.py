@@ -33,10 +33,10 @@ class TaskQueue(deque):
         if self._open_tasks == 0:
             return None
         i = 0
-        task_id, task = *self[i]
+        task_id, task = self[i]
         while task.in_use:
             i += 1
-            task_id, task = *self[i]
+            task_id, task = self[i]
         task.in_use = True
         self._open_tasks -= 1
         return task_id, task
