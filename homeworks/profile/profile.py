@@ -1,8 +1,11 @@
 import time
 
 
-def log(func):
-    func_name = func.__name__
+def log(func, cls=None):
+    if cls:
+        func_name = '.'.join((cls.__name__, func.__name__))
+    else:
+        func_name = func.__name__
 
     def logged_func(*args, **kwargs):
         print('`{}` started'.format(func_name))
@@ -19,7 +22,7 @@ def profile(obj):
     if isinstance(obj, type):
         for method_name, method in obj.__dict__.items():
             if callable(method):
-                setattr(obj, method_name, log(method))
+                setattr(obj, method_name, log(method, cls=obj))
         return obj
     elif callable(obj):
         return log(obj)
