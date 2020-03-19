@@ -1,4 +1,4 @@
-class DirDict(dict):
+class DirDict():
     def __init__(self, working_dir, *args, **kwargs):
         self._dir = working_dir
         self.update(*args, **kwargs)
@@ -17,7 +17,7 @@ class DirDict(dict):
     def __delitem__(self, key):
         pass
 
-    def __contains__(self):
+    def __contains__(self, value):
         pass
 
     def __iter__(self):
@@ -26,10 +26,10 @@ class DirDict(dict):
     def __len__(self):
         pass
 
-    def __eq__(self):
+    def __eq__(self, other):
         pass
 
-    def __ne__(self):
+    def __ne__(self, other):
         pass
 
     def __repr__(self):
@@ -50,7 +50,7 @@ class DirDict(dict):
     def fromkeys(self):
         pass
 
-    def get(self):
+    def get(self, key):
         pass
 
     def items(self):
@@ -59,17 +59,17 @@ class DirDict(dict):
     def keys(self):
         pass
 
-    def pop(self):
+    def pop(self, key):
         pass
 
     def popitem(self):
         pass
 
-    def setdefault(self):
+    def setdefault(self, key, default=None):
         pass
 
     def update(self, *args, **kwargs):
-        for key, value in dict(*args, **kwargs).iteritems():
+        for key, value in dict(*args, **kwargs).items():
             self[key] = value
 
     def values(self):
