@@ -1,17 +1,23 @@
 class DirDict(dict):
-    def __init__(self, dir):
+    def __init__(self, working_dir, *args, **kwargs):
+        self._dir = working_dir
+        self.update(*args, **kwargs)
+
+    def __getitem__(self, key):
+        file = open('/'.join((self._dir, key)), 'r')
+        value = file.read()
+        file.close()
+        return value
+
+    def __setitem__(self, key, value):
+        file = open('/'.join((self._dir, key)), 'w')
+        file.write(value)
+        file.close()
+
+    def __delitem__(self, key):
         pass
 
     def __contains__(self):
-        pass
-
-    def __getitem__(self):
-        pass
-
-    def __setitem__(self):
-        pass
-
-    def __delitem__(self):
         pass
 
     def __iter__(self):
@@ -62,8 +68,9 @@ class DirDict(dict):
     def setdefault(self):
         pass
 
-    def update(self):
-        pass
+    def update(self, *args, **kwargs):
+        for key, value in dict(*args, **kwargs).iteritems():
+            self[key] = value
 
     def values(self):
         pass
