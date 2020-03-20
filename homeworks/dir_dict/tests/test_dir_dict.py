@@ -30,18 +30,26 @@ class DirDictTestCase(TestCase):
         self.assertTrue(p1.exists())
         self.assertFalse(p1.is_dir())
 
-    def test_use_dict(self):
+    def test_use_dict__brackets(self):
         self.d['lang'] = 'Python\n'
         self.assertEqual('Python\n', self.d['lang'])
 
+    def test_use_dict__setdefault(self):
         self.d.setdefault('name')
         self.assertEqual('None', self.d['name'])
 
+    def test_use_dict__get(self):
+        self.d['lang'] = 'Python\n'
         self.assertEqual('Python\n', self.d.get('lang'))
 
-        pop_key = self.d.pop('lang')
-        self.assertEqual('Python\n', pop_key)
+    def test_use_dict__pop(self):
+        self.d['lang'] = 'Python\n'
+        self.assertEqual('Python\n', self.d.pop('lang'))
         with self.assertRaises(KeyError):
-            self.d['lang']
+            value = self.d['lang']
 
         self.assertEqual('None', self.d.get('lang'))
+
+    def test_use_dict__popitem(self):
+        self.d['lang'] = 'Python\n'
+        self.assertEqual(('lang', 'Python\n'), self.d.popitem('lang'))
