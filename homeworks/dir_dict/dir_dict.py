@@ -13,7 +13,7 @@ class DirDict():
     def __getitem__(self, key):
         if self.__contains__(key):
             with self._dir.joinpath(key).open('r') as file:
-                value = file.read_text()
+                value = file.read()
             return value
         else:
             raise KeyError
@@ -23,7 +23,7 @@ class DirDict():
         if not path.exists():
             path.touch()
         with path.open('w') as file:
-            file.write_text(value)
+            file.write(value)
 
     def __delitem__(self, key):
         if self.__contains__(key):
