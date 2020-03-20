@@ -30,6 +30,11 @@ class DirDictTestCase(TestCase):
         self.assertTrue(p1.exists())
         self.assertFalse(p1.is_dir())
 
+    def test_use_dict__init(self):
+        self.d = DirDict(self.test_path, name=None, lang='Python')
+        self.assertEqual('Python', self.d['lang'])
+        self.assertEqual('None', self.d['name'])
+
     def test_use_dict__brackets(self):
         self.d['lang'] = 'Python\n'
         self.assertEqual('Python\n', self.d['lang'])
