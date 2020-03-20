@@ -6,17 +6,22 @@ from dir_dict import DirDict
 
 class DirDictTestCase(TestCase):
 
-    def test_text__create(self):
-        d = DirDict('/tmp/dirdict')
-        d['lang'] = 'Python\n'
-        p = pathlib.Path('/tmp/dirdict')
-        p1 = pathlib.Path('/tmp/dirdict/lang')
+    test_path = '/tmp/dirdict'
 
-        self.assertEqual(True, p.exists())
-        self.assertEqual(True, p.is_dir())
+    def setUp(self):
+        self.d = DirDict(self.test_path)
+        self.p = pathlib.Path(self.test_path)
+
+    def tearDown(self):
+        for file in self.p.iterdir():
+            file.unlink()
+        self.p.rmdir()
+        self.assertEqual(False, self.p.exists())
+
+    def test_create_dict(self):
+        self.d['lang'] = 'Python\n'
+        p1 = pathlib.Path(self.test_path) / 'lang'
+        self.assertEqual(True, self.p.exists())
+        self.assertEqual(True, self.p.is_dir())
         self.assertEqual(True, p1.exists())
         self.assertEqual(False, p1.is_dir())
-
-        p1.unlink()
-        p.rmdir()
-        self.assertEqual(False, p.exists())
