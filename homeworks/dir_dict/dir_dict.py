@@ -4,7 +4,7 @@ import pathlib
 class DirDict():
     def __init__(self, working_dir, *args, **kwargs):
         self._dir = pathlib.Path(working_dir)
-        self._dir.mkdir(parents=True, exist_ok=True) #TODO: обработать случай, когда директория существует
+        self._dir.mkdir(parents=True, exist_ok=True)  # TODO: обработать случай, когда директория существует
         self.update(*args, **kwargs)
 
     def __contains__(self, key):
@@ -23,7 +23,7 @@ class DirDict():
         if not path.exists():
             path.touch()
         with path.open('w') as file:
-            file.write(value)
+            file.write(str(value))
 
     def __delitem__(self, key):
         if self.__contains__(key):
@@ -63,7 +63,7 @@ class DirDict():
     # def fromkeys(self):
     #     pass
 
-    def get(self, key, default=None):
+    def get(self, key, default='None'):
         if self.__contains__(key):
             return self.__getitem__(key)
         else:
@@ -83,16 +83,16 @@ class DirDict():
         return [self.__getitem__(key) for key in self._iter_keys()]
 
     def pop(self, key):
-        value = self.get(key, default=None)
+        value = self.get(key, default='None')
         self.__delitem__(key)
         return value
 
     def popitem(self, key):
-        value = self.get(key, default=None)
+        value = self.get(key, default='None')
         self.__delitem__(key)
         return key, value
 
-    def setdefault(self, key, default=None):
+    def setdefault(self, key, default='None'):
         if not self.__contains__(key):
             self.__setitem__(key, default)
 
