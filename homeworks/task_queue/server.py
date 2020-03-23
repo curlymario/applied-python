@@ -82,43 +82,43 @@ class TaskQueueServer:
                 command_name = command[0]
                 queue_name = command[1]
 
-                if command_name == b'ADD':
-                    if queue_name not in self._queues:
-                        queue = TaskQueue()
-                        self._queues[queue_name] = queue
-                    else:
-                        queue = self._queues[queue_name]
-                        length, data = command[2], command[3]
-                        answer = queue.add_new_task(Task(length, data))
-
-                # TODO: add timeout check
-                elif command_name == b'GET':
-                    if queue_name not in self._queues:
-                        answer = b'NONE'
-                    else:
-                        queue = self._queues[queue_name]
-                        if len(queue) != 0:
-                            task_id, task = queue.get_next_task()
-                            answer = b' '.join((task_id, task.length, task.data))
-                        else:
-                            answer = b'NONE'
-
-                elif command_name == b'ACK' or command_name == b'IN':
-                    if queue_name not in self._queues:
-                        answer = b'NO'
-                    else:
-                        queue = self._queues[queue_name]
-                        task_id = command[2]
-                        if command_name == b'ACK':
-                            answer = b'YES' if queue.finish_task(task_id) else b'NO'
-                        if command_name == b'IN':
-                            answer = b'YES' if queue.finish_task(task_id) else b'NO'
-
-                else:
+                if command_name:
                     answer = b'ERROR'
 
-                connection.send(answer)
-                connection.close()
+                    if command_name == b'ADD':
+                        if queue_name not in self._queues:
+                            queue = TaskQueue()
+                            self._queues[queue_name] = queue
+                        else:
+                            queue = self._queues[queue_name]
+                            length, data = command[2], command[3]
+                            answer = queue.add_new_task(Task(length, data))
+
+                    # TODO: add timeout check
+                    elif command_name == b'GET':
+                        if queue_name not in self._queues:
+                            answer = b'NONE'
+                        else:
+                            queue = self._queues[queue_name]
+                            if len(queue) != 0:
+                                task_id, task = queue.get_next_task()
+                                answer = b' '.join((task_id, task.length, task.data))
+                            else:
+                                answer = b'NONE'
+
+                    elif command_name == b'ACK' or command_name == b'IN':
+                        if queue_name not in self._queues:
+                            answer = b'NO'
+                        else:
+                            queue = self._queues[queue_name]
+                            task_id = command[2]
+                            if command_name == b'ACK':
+                                answer = b'YES' if queue.finish_task(task_id) else b'NO'
+                            if command_name == b'IN':
+                                answer = b'YES' if queue.finish_task(task_id) else b'NO'
+
+                    connection.send(answer)
+                    connection.close()
 
 
 def parse_args():
